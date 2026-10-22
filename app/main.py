@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 
 from app import __version__
 from app.api.analytics import router as analytics_router
+from app.api.documents import router as documents_router
 from app.api.routes import health_router, router
 from app.api.workflow import router as workflow_router
 from app.core.config import Settings
@@ -31,6 +32,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(health_router)
     application.include_router(router, prefix="/api/v1")
     application.include_router(analytics_router, prefix="/api/v1")
+    application.include_router(documents_router, prefix="/api/v1")
     application.include_router(workflow_router, prefix="/api/v1")
 
     @application.exception_handler(sqlite3.Error)

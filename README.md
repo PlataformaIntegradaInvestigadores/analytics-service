@@ -105,6 +105,10 @@ three received CSVs through streaming, atomic local snapshots, relationship chec
 and descriptive multi-label counts. Original CSVs and generated databases stay
 outside this repository. Temporal precision, coverage and academic-use permission
 remain subject to clarification; this adapter does not train models.
+The [document preparation and query workflow](docs/preparacion-documental.md)
+adds immutable development working sets, Unicode text preparation, document and
+descriptor queries, candidate protocols and structural checks of supplied topic
+outputs. It preserves pending training authorization and temporal limitations.
 The dated environment/inventory JSON files in `docs/` record a specific local
 inspection; their platform and dependency versions are not universal defaults.
 
