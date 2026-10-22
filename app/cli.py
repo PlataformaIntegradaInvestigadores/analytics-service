@@ -9,6 +9,7 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from app.application import analysis
+from app.data.forecast_runs import ForecastRunStore
 from app.data.snapshots import SnapshotStore
 from app.domain.common import AnalyticsError, canonical_json
 from app.schemas.analytics import (
@@ -32,16 +33,28 @@ OPERATIONS = {
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("operation", choices=[*OPERATIONS, "restore"])
+    parser.add_argument(
+        "operation", choices=[*OPERATIONS, "restore", "restore-forecast"]
+    )
     parser.add_argument(
         "--input", type=Path, help="JSON request; required except for restore"
     )
     parser.add_argument("--database", type=Path, help="Explicit local SQLite file")
     parser.add_argument("--batch-id", help="Content-addressed batch to restore")
+    parser.add_argument(
+        "--run-id", help="Content-addressed reference forecast to restore"
+    )
     args = parser.parse_args(argv)
     try:
-        if args.operation == "restore":
-            if args.input or not args.database or not args.batch_id:
+        if args.operation == "restore-forecast":
+            if args.input or args.batch_id or not args.database or not args.run_id:
+                raise AnalyticsError(
+                    "invalid_arguments",
+                    "restore-forecast requires database and run-id only",
+                )
+            result = ForecastRunStore(args.database).load(args.run_id)
+        elif args.operation == "restore":
+            if args.input or args.run_id or not args.database or not args.batch_id:
                 raise AnalyticsError(
                     "invalid_arguments", "restore requires database and batch-id only"
                 )
@@ -49,7 +62,7 @@ def main(argv: list[str] | None = None) -> int:
                 raise AnalyticsError("snapshot_not_found", "Database does not exist")
             result = SnapshotStore(args.database).load(args.batch_id)
         else:
-            if not args.input or args.batch_id:
+            if not args.input or args.batch_id or args.run_id:
                 raise AnalyticsError(
                     "invalid_arguments", "An input file is required; no batch-id"
                 )
@@ -58,11 +71,15 @@ def main(argv: list[str] | None = None) -> int:
                 args.input.read_text(encoding="utf-8-sig")
             ).model_dump()
             if args.database:
-                if args.operation != "curate":
+                if args.operation == "curate":
+                    result = SnapshotStore(args.database).save(**payload)
+                elif args.operation == "forecast":
+                    result = ForecastRunStore(args.database).save(payload)
+                else:
                     raise AnalyticsError(
-                        "invalid_arguments", "Only curate persists snapshots"
+                        "invalid_arguments",
+                        "Only curate and forecast persist artifacts",
                     )
-                result = SnapshotStore(args.database).save(**payload)
             else:
                 result = operation(payload)
         print(canonical_json(result))
