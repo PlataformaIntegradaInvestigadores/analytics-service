@@ -7,6 +7,12 @@ provided topic assignments, historical features, reference forecasts and rolling
 evaluation. It also provides read-only software/environment audits and reference
 run restoration/replay. The status endpoint reports `data-foundation`.
 
+The local workflow also validates explicit CSV/JSONL exports, versions declared
+topic catalogs, compares reference methods on common temporal origins, and stores
+immutable experiment artifacts with lineage and software provenance. Paginated
+queries and observed/forecast projections prepare the existing frontend's data
+contract; XAI responses explicitly remain pending/unavailable.
+
 Corpus acquisition, a deployed Data Lakehouse, fitted topic/predictive models,
 XAI and frontend/identity integration remain pending. Controlled test fixtures
 are explicitly synthetic and do not constitute empirical thesis results.
@@ -28,6 +34,8 @@ app/
   schemas/      Pydantic models of the public API
   core/         settings, input limits, JSON decoding and software provenance
   audit.py      read-only inventory, manifest, schema and replay commands
+  imports.py    read-only bounded CSV/JSONL export inspection
+  experiments.py local artifact save/query/replay commands
 tests/
 ```
 
@@ -62,7 +70,18 @@ The following POST operations are enabled only when
 /api/v1/forecasts/features
 /api/v1/forecasts/reference
 /api/v1/evaluations/backtest
+/api/v1/topics/catalog
+/api/v1/series/from-catalog
+/api/v1/evaluations/compare
+/api/v1/experiments
 ```
+
+Local GET operations expose `/datasets/dictionary`, `/dashboard/contract`,
+`/experiments`, `/experiments/{id}`, `/experiments/{id}/explanation` and
+`/experiments/{id}/dashboard`, under `/api/v1`. Experiment storage requires an
+explicit server-side `ANALYTICS_ARTIFACT_DATABASE` path. No database path is
+accepted from HTTP clients. Keep databases outside the repository and only use
+loopback while identity integration remains pending.
 
 OpenAPI describes inputs, outputs and errors. HTTP bodies and CLI input files
 are limited to 8 MiB by default; HTTP limits can be configured with
@@ -79,6 +98,13 @@ python -X utf8 -m app.audit schema --public-base-path /api/analytics
 See [local operations and reproduction](docs/operacion-reproducible.md),
 [architecture diagnosis](docs/diagnostico-arquitectura.md) and
 [provided-literature review](docs/revision-literatura.md).
+See [analytical workflow, examples and backlog mapping](docs/flujo-analitico-local.md)
+for exact limits, implemented/pending scope and manual Git Bash/VS Code/Azure steps.
+The [Centinela development corpus adapter](docs/corpus-desarrollo.md) handles the
+three received CSVs through streaming, atomic local snapshots, relationship checks
+and descriptive multi-label counts. Original CSVs and generated databases stay
+outside this repository. Temporal precision, coverage and academic-use permission
+remain subject to clarification; this adapter does not train models.
 The dated environment/inventory JSON files in `docs/` record a specific local
 inspection; their platform and dependency versions are not universal defaults.
 

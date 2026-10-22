@@ -1,10 +1,12 @@
 """Stateless orchestration; no database, framework or model-service dependency."""
 
-from app.domain.common import AnalyticsError
+from app.domain.common import AnalyticsError, next_month
+from app.domain.comparison import compare_references
 from app.domain.corpus import curate, temporal_split
 from app.domain.features import historical_features
 from app.domain.forecasting import backtest, reference_forecast
 from app.domain.series import build_series
+from app.domain.topics import build_catalog
 
 
 def curate_batch(payload: dict) -> dict:
@@ -71,3 +73,60 @@ def backtest_batch(payload: dict) -> dict:
 def features_batch(payload: dict) -> dict:
     options, points, provenance = _prepare(payload)
     return {**historical_features(points, **options), **provenance}
+
+
+def catalog_batch(payload: dict) -> dict:
+    options = payload.copy()
+    dataset = curate_batch(options.pop("batch"))
+    return build_catalog(dataset, **options)
+
+
+def catalog_series_batch(payload: dict) -> dict:
+    catalog = catalog_batch(payload["catalog"])
+    if (
+        catalog["method"] == "topic_model"
+        and catalog["fit_cutoff"] >= payload["start"] + "-01"
+    ):
+        raise AnalyticsError(
+            "topic_temporal_leakage", "Thematic fit must precede the series window"
+        )
+    return aggregate_batch(
+        {
+            "batch": payload["catalog"]["batch"],
+            "assignments": catalog["assignments"],
+            "topic_ids": [topic["topic_id"] for topic in catalog["topics"]],
+            "topic_definition_version": catalog["topic_definition_version"],
+            "start": payload["start"],
+            "end": payload["end"],
+            "covered_periods": payload["covered_periods"],
+        }
+    )
+
+
+def comparison_batch(payload: dict) -> dict:
+    options, points, provenance = _prepare(payload)
+    comparison = compare_references(points, **options)
+    if comparison["common_origins"]:
+        # A frozen retrospective series cannot pretend delayed records were known
+        # at their original month end. Dynamic as-of reconstruction is future work.
+        latest = comparison["common_origins"][-1]
+        dataset = curate_batch(payload["series"]["batch"])
+        for document in dataset["documents"]:
+            publication = document["publication_date"]
+            if publication is None:
+                continue
+            month = publication[:7]
+            if payload["series"]["start"] <= month <= latest and (
+                document["available_on"] is None
+                or document["available_on"] >= next_month(month) + "-01"
+            ):
+                raise AnalyticsError(
+                    "unverified_series_availability",
+                    "Frozen monthly counts require known availability by their "
+                    "month end; late arrivals need as-of reconstruction",
+                )
+    return {
+        **comparison,
+        **provenance,
+        "availability_policy": "frozen_counts_known_by_publication_month_end",
+    }

@@ -1,3 +1,4 @@
+import sqlite3
 from uuid import uuid4
 
 from fastapi import FastAPI, Request
@@ -7,6 +8,7 @@ from fastapi.responses import JSONResponse
 from app import __version__
 from app.api.analytics import router as analytics_router
 from app.api.routes import health_router, router
+from app.api.workflow import router as workflow_router
 from app.core.config import Settings
 from app.core.request_limits import RequestBodyLimitMiddleware
 from app.domain.common import AnalyticsError
@@ -29,6 +31,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(health_router)
     application.include_router(router, prefix="/api/v1")
     application.include_router(analytics_router, prefix="/api/v1")
+    application.include_router(workflow_router, prefix="/api/v1")
+
+    @application.exception_handler(sqlite3.Error)
+    async def storage_error(request: Request, exc: sqlite3.Error):
+        return JSONResponse(
+            status_code=503,
+            content={
+                "detail": {
+                    "code": "artifact_storage_unavailable",
+                    "message": "Local artifact storage is unavailable",
+                }
+            },
+        )
 
     @application.exception_handler(AnalyticsError)
     async def analytical_error(request: Request, exc: AnalyticsError):

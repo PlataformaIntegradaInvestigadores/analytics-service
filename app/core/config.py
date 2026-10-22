@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Literal
 
 from pydantic import Field, field_validator
@@ -12,6 +13,7 @@ class Settings(BaseSettings):
     environment: Literal["local", "staging", "production"] = "local"
     public_base_path: str = "/api/v1"
     port: int = Field(default=8006, ge=1024, le=65535)
+    artifact_database: Path | None = None
     max_request_bytes: int = Field(
         default=8 * 1024 * 1024, ge=1024, le=64 * 1024 * 1024
     )

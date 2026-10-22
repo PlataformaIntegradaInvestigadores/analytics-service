@@ -21,6 +21,7 @@ from app.schemas.analytics import (
     SeriesRequest,
     SplitRequest,
 )
+from app.schemas.workflow import CatalogRequest, CatalogSeriesRequest, ComparisonRequest
 
 OPERATIONS = {
     "curate": (BatchRequest, analysis.curate_batch),
@@ -29,6 +30,9 @@ OPERATIONS = {
     "forecast": (ForecastRequest, analysis.forecast_batch),
     "backtest": (BacktestRequest, analysis.backtest_batch),
     "features": (FeaturesRequest, analysis.features_batch),
+    "catalog": (CatalogRequest, analysis.catalog_batch),
+    "catalog-series": (CatalogSeriesRequest, analysis.catalog_series_batch),
+    "compare": (ComparisonRequest, analysis.comparison_batch),
 }
 
 
