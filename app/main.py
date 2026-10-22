@@ -2,22 +2,36 @@ from uuid import uuid4
 
 from fastapi import FastAPI, Request
 from fastapi.openapi.utils import get_openapi
+from fastapi.responses import JSONResponse
 
 from app import __version__
+from app.api.analytics import router as analytics_router
 from app.api.routes import health_router, router
 from app.core.config import Settings
+from app.domain.common import AnalyticsError
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings if settings is not None else Settings()
     application = FastAPI(
         title="Centinela Analytics Service",
-        description="Service bootstrap. Analytics pipelines are not implemented yet.",
+        description=(
+            "Local curation, temporal partitions, declared-topic series and reference "
+            "forecasts. Empirical validation, topic modeling and XAI remain pending."
+        ),
         version=__version__,
     )
     application.state.settings = settings
     application.include_router(health_router)
     application.include_router(router, prefix="/api/v1")
+    application.include_router(analytics_router, prefix="/api/v1")
+
+    @application.exception_handler(AnalyticsError)
+    async def analytical_error(request: Request, exc: AnalyticsError):
+        return JSONResponse(
+            status_code=422,
+            content={"detail": {"code": exc.code, "message": str(exc)}},
+        )
 
     @application.middleware("http")
     async def add_trace_id(request: Request, call_next):

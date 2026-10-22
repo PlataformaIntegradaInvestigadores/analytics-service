@@ -29,10 +29,10 @@ def test_health_reports_only_runtime():
     }
 
 
-def test_status_reports_bootstrap_stage():
+def test_status_reports_foundation_stage():
     response = make_client().get("/api/v1/status")
     assert response.status_code == 200
-    assert response.json()["stage"] == "bootstrap"
+    assert response.json()["stage"] == "data-foundation"
     assert "analytics_enabled" not in response.json()
 
 
@@ -40,7 +40,9 @@ def test_openapi_is_cached_and_excludes_health():
     client = make_client(public_base_path="/api/analytics/")
     schema = client.get("/openapi.json").json()
     assert schema["servers"] == [{"url": "/api/analytics"}]
-    assert list(schema["paths"]) == ["/status"]
+    assert "/status" in schema["paths"]
+    assert "/datasets/curate" in schema["paths"]
+    assert "/health" not in schema["paths"]
     assert client.app.openapi() is client.app.openapi()
     assert "/api/v1/status" not in schema["paths"]
 
