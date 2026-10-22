@@ -7,6 +7,12 @@ from app.domain.common import AnalyticsError, fingerprint, next_month, parse_mon
 REFERENCE_VERSION = "reference-v1"
 
 
+def _positive_integer(value, maximum: int) -> bool:
+    return (
+        isinstance(value, int) and not isinstance(value, bool) and 1 <= value <= maximum
+    )
+
+
 def validate_points(points: list[dict]) -> None:
     if not 1 <= len(points) <= 240:
         raise AnalyticsError("invalid_history", "Provide 1..240 ordered monthly points")
@@ -39,7 +45,7 @@ def reference_forecast(
 ) -> dict:
     validate_points(points)
     parse_month(cutoff)
-    if not 1 <= horizon <= 24 or not 1 <= season_length <= 24:
+    if not _positive_integer(horizon, 24) or not _positive_integer(season_length, 24):
         raise AnalyticsError("invalid_horizon", "Horizon and season must be 1..24")
     if method not in ("last_value", "seasonal_naive"):
         raise AnalyticsError("invalid_method", "Unknown reference method")
@@ -86,7 +92,10 @@ def error_metrics(
     if not observed or len(observed) != len(predicted):
         raise AnalyticsError("invalid_metrics", "Provide nonempty paired observations")
     if any(
-        not math.isfinite(v) or not 0 <= v <= 1e12
+        isinstance(v, bool)
+        or not isinstance(v, (int, float))
+        or not math.isfinite(v)
+        or not 0 <= v <= 1e12
         for v in observed + predicted + training
     ):
         raise AnalyticsError(
@@ -141,7 +150,7 @@ def backtest(
         raise AnalyticsError(
             "invalid_validation", "Validation must precede reserved final test"
         )
-    if not 1 <= min_train <= 240:
+    if not _positive_integer(min_train, 240):
         raise AnalyticsError(
             "invalid_training_window", "Training window must be 1..240"
         )

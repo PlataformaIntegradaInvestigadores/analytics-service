@@ -8,6 +8,7 @@ from app import __version__
 from app.api.analytics import router as analytics_router
 from app.api.routes import health_router, router
 from app.core.config import Settings
+from app.core.request_limits import RequestBodyLimitMiddleware
 from app.domain.common import AnalyticsError
 
 
@@ -22,6 +23,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         version=__version__,
     )
     application.state.settings = settings
+    application.add_middleware(
+        RequestBodyLimitMiddleware, max_bytes=settings.max_request_bytes
+    )
     application.include_router(health_router)
     application.include_router(router, prefix="/api/v1")
     application.include_router(analytics_router, prefix="/api/v1")

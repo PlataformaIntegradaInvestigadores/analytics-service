@@ -69,7 +69,7 @@ def _normalize(raw: dict) -> dict:
         if instant.tzinfo is None or "T" not in retrieved:
             raise ValueError
         instant = instant.astimezone(UTC)
-    except ValueError as exc:
+    except (ValueError, OverflowError) as exc:
         raise AnalyticsError(
             "invalid_retrieval_time",
             "retrieved_at requires a timezone-aware ISO instant",

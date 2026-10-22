@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     environment: Literal["local", "staging", "production"] = "local"
     public_base_path: str = "/api/v1"
     port: int = Field(default=8006, ge=1024, le=65535)
+    max_request_bytes: int = Field(
+        default=8 * 1024 * 1024, ge=1024, le=64 * 1024 * 1024
+    )
 
     @field_validator("public_base_path")
     @classmethod

@@ -1,0 +1,280 @@
+{
+  "inventory_version": "software-inventory-v1",
+  "modules": [
+    {
+      "file": "app/__init__.py",
+      "sha256": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed",
+      "layer": "entrypoint",
+      "imports": []
+    },
+    {
+      "file": "app/api/__init__.py",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "layer": "api",
+      "imports": []
+    },
+    {
+      "file": "app/api/analytics.py",
+      "sha256": "9e0d21f398e1c17c35ca3d7bcd24c9b1f9d1fd830406a2845deeb3f8b0811651",
+      "layer": "api",
+      "imports": [
+        "app.application",
+        "app.schemas.analytics",
+        "fastapi"
+      ]
+    },
+    {
+      "file": "app/api/routes.py",
+      "sha256": "eff4bf791c60e309dd1251e9a4324a16869ad86820c1009d0531592b6bb6a6f1",
+      "layer": "api",
+      "imports": [
+        "app",
+        "fastapi"
+      ]
+    },
+    {
+      "file": "app/application/__init__.py",
+      "sha256": "4f84de41c19f7c60460bb7e2fd7960e7bd3b629c7870413d5de7f6d089ad1358",
+      "layer": "application",
+      "imports": []
+    },
+    {
+      "file": "app/application/analysis.py",
+      "sha256": "49e78bea6f1b3405cec0ffb69dda00c221169594350dd6f0cb10b05af690e267",
+      "layer": "application",
+      "imports": [
+        "app.domain.common",
+        "app.domain.corpus",
+        "app.domain.features",
+        "app.domain.forecasting",
+        "app.domain.series"
+      ]
+    },
+    {
+      "file": "app/audit.py",
+      "sha256": "65ec0952372a3df27c29b3237dd01e602cc305aa549d1f4e7bbe218dfc72e4a9",
+      "layer": "entrypoint",
+      "imports": [
+        "app",
+        "app.application.analysis",
+        "app.core.config",
+        "app.core.json_io",
+        "app.core.provenance",
+        "app.data.forecast_runs",
+        "app.domain.common",
+        "app.main",
+        "argparse",
+        "importlib.metadata",
+        "pathlib",
+        "platform",
+        "sqlite3",
+        "sys"
+      ]
+    },
+    {
+      "file": "app/cli.py",
+      "sha256": "6c4e5b3e4079e51852424168e5bd8802d8cf1a042534bc1ecb1aee3d6c1e025c",
+      "layer": "entrypoint",
+      "imports": [
+        "app.application",
+        "app.core.json_io",
+        "app.data.forecast_runs",
+        "app.data.snapshots",
+        "app.domain.common",
+        "app.schemas.analytics",
+        "argparse",
+        "json",
+        "pathlib",
+        "pydantic",
+        "sqlite3",
+        "sys"
+      ]
+    },
+    {
+      "file": "app/core/__init__.py",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "layer": "core",
+      "imports": []
+    },
+    {
+      "file": "app/core/config.py",
+      "sha256": "f303add8276db65745f849e3af62557cc982bbe7496a90512e4eb5b2854089c4",
+      "layer": "core",
+      "imports": [
+        "pydantic",
+        "pydantic_settings",
+        "typing"
+      ]
+    },
+    {
+      "file": "app/core/json_io.py",
+      "sha256": "9042dce0aa4bc4babed2f4faf6fb452cbb29015cb8ce755e89a92dfa372eeb37",
+      "layer": "core",
+      "imports": [
+        "app.domain.common",
+        "json",
+        "math",
+        "pathlib"
+      ]
+    },
+    {
+      "file": "app/core/provenance.py",
+      "sha256": "bbcfa72e760eacaf75c80b72aa64efb5fcfb8235022bff6e4a58dd8a4cfca421",
+      "layer": "core",
+      "imports": [
+        "app",
+        "app.domain.common",
+        "ast",
+        "hashlib",
+        "importlib",
+        "pathlib",
+        "platform",
+        "re",
+        "sqlite3"
+      ]
+    },
+    {
+      "file": "app/core/request_limits.py",
+      "sha256": "ffb918506ee9dfbbf2efa3f2291a01de263980a585b66b159d6b48ba45e49124",
+      "layer": "core",
+      "imports": [
+        "app.core.json_io",
+        "app.domain.common",
+        "starlette.responses"
+      ]
+    },
+    {
+      "file": "app/data/__init__.py",
+      "sha256": "fe5c599e4b4c4cdf5147224ab23a914c3391424f6f743f6d8aaa5606a4ea7594",
+      "layer": "data",
+      "imports": []
+    },
+    {
+      "file": "app/data/forecast_runs.py",
+      "sha256": "a4f5df93500ce4bae284907bb43c8b903d717af02de4d398372b55a7a13e2ae8",
+      "layer": "data",
+      "imports": [
+        "app",
+        "app.application.analysis",
+        "app.domain.common",
+        "app.schemas.analytics",
+        "contextlib",
+        "hashlib",
+        "importlib.metadata",
+        "json",
+        "pathlib",
+        "platform",
+        "pydantic",
+        "re",
+        "sqlite3"
+      ]
+    },
+    {
+      "file": "app/data/snapshots.py",
+      "sha256": "c8dffcc5de9e90dd23569881a6382254dd9d525a87d2efd84b35035dba5120b8",
+      "layer": "data",
+      "imports": [
+        "app.domain.common",
+        "app.domain.corpus",
+        "contextlib",
+        "json",
+        "pathlib",
+        "sqlite3"
+      ]
+    },
+    {
+      "file": "app/domain/__init__.py",
+      "sha256": "2817b2bbb15ae96f978da652a2788c4e125fb00a165846f31d17c9281d5fdcca",
+      "layer": "domain",
+      "imports": []
+    },
+    {
+      "file": "app/domain/common.py",
+      "sha256": "82a8e671412cde72eb2d6b6aaebed8e08fff16796f72fae21287261dadbed6f5",
+      "layer": "domain",
+      "imports": [
+        "datetime",
+        "hashlib",
+        "json",
+        "typing"
+      ]
+    },
+    {
+      "file": "app/domain/corpus.py",
+      "sha256": "9d881ae587742be17654fa16b38c1854cbc968e782c4fd1bea9e5a5331d29201",
+      "layer": "domain",
+      "imports": [
+        "app.domain.common",
+        "collections",
+        "datetime",
+        "re",
+        "typing",
+        "unicodedata",
+        "urllib.parse"
+      ]
+    },
+    {
+      "file": "app/domain/features.py",
+      "sha256": "3e357eb77d147e6c73a1c63b32ab3337687e45ba73a5b8a066a1c4468c36b3fc",
+      "layer": "domain",
+      "imports": [
+        "app.domain.common",
+        "app.domain.forecasting",
+        "math"
+      ]
+    },
+    {
+      "file": "app/domain/forecasting.py",
+      "sha256": "cdca0e9fdf84fff00597ac545dad5700f4a556d3205275105ee22b50563c53b5",
+      "layer": "domain",
+      "imports": [
+        "app.domain.common",
+        "math"
+      ]
+    },
+    {
+      "file": "app/domain/series.py",
+      "sha256": "7cc0d9d39e01d52a81f35e1434330fe37c0e30b2da206c9d44f67b346c1f7f18",
+      "layer": "domain",
+      "imports": [
+        "app.domain.common",
+        "collections"
+      ]
+    },
+    {
+      "file": "app/main.py",
+      "sha256": "0b5a54f1f06b970b4ade34134e6e5531865db14d610aa7839c5a4225453334b6",
+      "layer": "entrypoint",
+      "imports": [
+        "app",
+        "app.api.analytics",
+        "app.api.routes",
+        "app.core.config",
+        "app.core.request_limits",
+        "app.domain.common",
+        "fastapi",
+        "fastapi.openapi.utils",
+        "fastapi.responses",
+        "uuid"
+      ]
+    },
+    {
+      "file": "app/schemas/__init__.py",
+      "sha256": "b416bee9f8e56fa70d310753371bc5ac3566e856c3806fdee4bb8b74157dffe6",
+      "layer": "schemas",
+      "imports": []
+    },
+    {
+      "file": "app/schemas/analytics.py",
+      "sha256": "52eb6a09cec83d6bcecc67fc33dded29ec7bc981bf3a8cac82bc7c86a2821d21",
+      "layer": "schemas",
+      "imports": [
+        "pydantic",
+        "typing"
+      ]
+    }
+  ],
+  "boundary_violations": [],
+  "status": "ok",
+  "evidence": "Local source inspection; no external service connectivity was tested"
+}

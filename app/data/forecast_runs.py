@@ -3,6 +3,7 @@
 import hashlib
 import json
 import platform
+import re
 import sqlite3
 from contextlib import closing
 from importlib.metadata import version
@@ -72,6 +73,24 @@ def _restore(payload: str, run_id: str) -> dict:
             or artifact["artifact_kind"] != "reference_forecast"
         ):
             raise ValueError("Invalid artifact envelope")
+        if (
+            not isinstance(artifact["runtime"], dict)
+            or set(artifact["runtime"]) != {"python", "service", "pydantic"}
+            or any(
+                not isinstance(value, str) or not value
+                for value in artifact["runtime"].values()
+            )
+        ):
+            raise ValueError("Invalid runtime manifest")
+        if (
+            not isinstance(artifact["code_sha256"], dict)
+            or set(artifact["code_sha256"]) != set(SOURCE_FILES)
+            or any(
+                not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{64}", value)
+                for value in artifact["code_sha256"].values()
+            )
+        ):
+            raise ValueError("Invalid source manifest")
         request = ForecastRequest.model_validate(artifact["request"]).model_dump(
             mode="json"
         )
@@ -107,6 +126,7 @@ class ForecastRunStore:
         artifact = _build_artifact(payload)
         run_id = fingerprint(artifact)
         encoded = canonical_json(artifact)
+        restored = _restore(encoded, run_id)
         with closing(sqlite3.connect(self.path)) as connection, connection:
             connection.execute(
                 "CREATE TABLE IF NOT EXISTS forecast_runs "
@@ -123,7 +143,14 @@ class ForecastRunStore:
             connection.execute(
                 "INSERT OR IGNORE INTO forecast_runs VALUES (?, ?)", (run_id, encoded)
             )
-        return _restore(encoded, run_id)
+            persisted = connection.execute(
+                "SELECT payload FROM forecast_runs WHERE run_id = ?", (run_id,)
+            ).fetchone()
+            if persisted != (encoded,):
+                raise AnalyticsError(
+                    "forecast_run_corrupt", "Run changed during persistence"
+                )
+        return restored
 
     def load(self, run_id: str) -> dict:
         if not self.path.is_file():

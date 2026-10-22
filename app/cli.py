@@ -9,6 +9,7 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from app.application import analysis
+from app.core.json_io import read_json_file
 from app.data.forecast_runs import ForecastRunStore
 from app.data.snapshots import SnapshotStore
 from app.domain.common import AnalyticsError, canonical_json
@@ -67,9 +68,7 @@ def main(argv: list[str] | None = None) -> int:
                     "invalid_arguments", "An input file is required; no batch-id"
                 )
             schema, operation = OPERATIONS[args.operation]
-            payload = schema.model_validate_json(
-                args.input.read_text(encoding="utf-8-sig")
-            ).model_dump()
+            payload = schema.model_validate(read_json_file(args.input)).model_dump()
             if args.database:
                 if args.operation == "curate":
                     result = SnapshotStore(args.database).save(**payload)

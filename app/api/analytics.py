@@ -35,6 +35,14 @@ router = APIRouter(
     tags=["Local analytics"],
     dependencies=[Depends(local_processing_only)],
     responses={
+        400: {
+            "model": ErrorResponse,
+            "description": "Invalid JSON or body length header",
+        },
+        413: {
+            "model": ErrorResponse,
+            "description": "Request body exceeds configured limit",
+        },
         422: {
             "model": ErrorResponse,
             "description": "Invalid contract or analytical input",

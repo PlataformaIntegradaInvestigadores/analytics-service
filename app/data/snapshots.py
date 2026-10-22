@@ -30,6 +30,7 @@ class SnapshotStore:
             key: result[key] for key in ("curation_version", "data_kind", "documents")
         }
         with closing(self._connect()) as connection, connection:
+            connection.execute("BEGIN IMMEDIATE")
             connection.execute(
                 "CREATE TABLE IF NOT EXISTS datasets "
                 "(version TEXT PRIMARY KEY, payload TEXT NOT NULL)"
@@ -59,10 +60,23 @@ class SnapshotStore:
                 "(SELECT COUNT(*) FROM batches b WHERE b.dataset_version = s.version) "
                 "AS batch_count FROM datasets s"
             )
-            existing = connection.execute(
-                "SELECT result_payload FROM batches WHERE batch_id = ?", (batch_id,)
+            expected_batch = (
+                canonical_json(result),
+                canonical_json(records),
+                result["dataset_version"],
+            )
+            existing_dataset = connection.execute(
+                "SELECT payload FROM datasets WHERE version = ?",
+                (result["dataset_version"],),
             ).fetchone()
-            if existing and existing[0] != canonical_json(result):
+            if existing_dataset:
+                self._verify_dataset(connection, result["dataset_version"], dataset)
+            existing = connection.execute(
+                "SELECT result_payload, raw_payload, dataset_version "
+                "FROM batches WHERE batch_id = ?",
+                (batch_id,),
+            ).fetchone()
+            if existing and existing != expected_batch:
                 raise AnalyticsError(
                     "snapshot_corrupt", "Existing batch differs from its identity"
                 )
@@ -86,14 +100,45 @@ class SnapshotStore:
                     canonical_json(result),
                 ),
             )
+            self._verify_dataset(connection, result["dataset_version"], dataset)
+            actual_batch = connection.execute(
+                "SELECT result_payload, raw_payload, dataset_version "
+                "FROM batches WHERE batch_id = ?",
+                (batch_id,),
+            ).fetchone()
+            if actual_batch != expected_batch:
+                raise AnalyticsError(
+                    "snapshot_corrupt", "Batch changed during persistence"
+                )
         return self.load(batch_id)
+
+    @staticmethod
+    def _verify_dataset(connection, dataset_version: str, dataset: dict) -> None:
+        stored = connection.execute(
+            "SELECT payload FROM datasets WHERE version = ?", (dataset_version,)
+        ).fetchone()
+        documents = connection.execute(
+            "SELECT payload FROM documents WHERE dataset_version = ? "
+            "ORDER BY document_id",
+            (dataset_version,),
+        ).fetchall()
+        if (
+            not stored
+            or stored[0] != canonical_json(dataset)
+            or [row[0] for row in documents]
+            != [canonical_json(d) for d in dataset["documents"]]
+        ):
+            raise AnalyticsError(
+                "snapshot_corrupt", "Snapshot integrity verification failed"
+            )
 
     def load(self, batch_id: str) -> dict:
         import json
 
         if not self.path.is_file():
             raise AnalyticsError("snapshot_not_found", "Database does not exist")
-        with closing(self._connect()) as connection:
+        uri = self.path.resolve().as_uri() + "?mode=ro"
+        with closing(sqlite3.connect(uri, uri=True)) as connection:
             row = connection.execute(
                 "SELECT raw_payload, result_payload, dataset_version "
                 "FROM batches WHERE batch_id = ?",
