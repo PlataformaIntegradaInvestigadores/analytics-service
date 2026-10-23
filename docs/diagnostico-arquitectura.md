@@ -68,7 +68,7 @@ Este segundo diagrama es el diseño objetivo, no un flujo ya desplegado. Neo4j p
 | MongoDB existente | Datos y salidas ya administrados por search-service | Exigir esquema/exportación, procedencia y cobertura comprobables | Fuente existente; no elegirlo automáticamente como almacén analítico final |
 | Objetos/archivos abiertos con capa de tablas transaccionales | Textos originales y tablas analíticas bajo el enfoque Lakehouse del plan | Requiere catálogo, transacciones, versiones y asociación a cada experimento | Obligación arquitectónica pendiente; seleccionar formato/motor con infraestructura y recursos reales |
 
-No se declara implementado Delta Lake, Iceberg, Parquet transaccional ni almacenamiento de objetos. La decisión de formato queda abierta hasta comprobar dónde se desplegará y qué recursos están habilitados; un directorio de JSON no se denominará Lakehouse.
+No se declara implementado Delta Lake, Iceberg ni almacenamiento de objetos institucional. El incremento técnico añade un prototipo local de objetos Parquet con catálogo SQLite transaccional, historial y evolución aditiva; véase `incremento-modelado-tecnico.md`. Es una prueba de viabilidad y no un Lakehouse distribuido. La decisión de formato queda abierta hasta comprobar dónde se desplegará y qué recursos están habilitados.
 
 ## Contratos y límites de responsabilidad
 
