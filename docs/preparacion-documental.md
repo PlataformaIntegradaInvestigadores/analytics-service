@@ -76,13 +76,13 @@ OpenAPI en `/docs` expone:
 
 Las rutas se mantienen deshabilitadas en staging/production. Las ubicaciones se configuran en el servidor; el navegador no elige archivos. Un detalle inexistente devuelve 404, entradas inválidas 422 y configuración ausente 503. El navegador solo debe consultar estos datos en el contexto local autorizado hasta resolver identidad y publicación.
 
-Los contratos backend están implementados. La pantalla Angular todavía no está implementada: el checkout local no contiene centinela-front. Cuando el titular prepare ese repositorio se integrarán estas consultas en sus servicios/componentes existentes, conservando estados de carga, vacío, error, filtros y distinción entre diagnóstico descriptivo y resultados de modelos. No se crea una interfaz paralela.
+Los contratos backend están implementados. El incremento posterior incorpora el explorador documental Angular en el checkout de centinela-front, con estados de carga, vacío y error, filtros y separación entre diagnóstico descriptivo y resultados de modelos. Su alcance y ejecución se describen en `centinela-front/docs/research-analytics.md`. Sigue pendiente comprobar el flujo real con identidad y gateway; las pruebas de componentes y contratos no acreditan esa integración.
 
 ## Git, revisiones y trazabilidad
 
 Los estados de Azure y operaciones Git corresponden al titular. Revisar antes de agregar o confirmar cambios. Como el PR de la rama anterior puede estar en revisión, continuar añadiendo commits a esa misma rama también modifica su PR. Para conservar la revisión delimitada se puede guardar este incremento en una rama dependiente creada por el titular desde el estado actual. Esta incluirá inicialmente los commits anteriores: antes de abrir su PR hacia develop deberá integrarse el primer trabajo y revisarse la base con el procedimiento del equipo. Conservar los cambios locales al cambiar de rama. Los PR se dirigen a develop y mantienen las dos aprobaciones y CODEOWNERS.
 
-Alcance para Azure: R08/R09 avanzan en preparación y selección para desarrollo; R10/R11 en contratos y controles estructurales, con entrenamiento pendiente; R19 en consultas locales; R20/R27 solo en respaldo backend, con Angular e integración pendientes; R24/R30 en pruebas y reproducción. No cerrar el requerimiento completo por disponer de contratos o métricas estructurales.
+Alcance para Azure: R08/R09 avanzan en preparación y selección para desarrollo; R10/R11 en contratos y controles estructurales, con entrenamiento pendiente; R19 en consultas locales; R20/R27 cuentan además con el explorador Angular del incremento posterior, con integración entre servicios pendiente; R24/R30 en pruebas y reproducción. No cerrar el requerimiento completo por disponer de contratos, una pantalla local o métricas estructurales.
 
 ## Evidencia técnica del incremento
 

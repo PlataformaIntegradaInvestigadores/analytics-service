@@ -6,6 +6,8 @@ No certifica un despliegue ni modifica el alcance académico aprobado.
 
 ## Evidencia y límites
 
+Actualización del 23 de octubre de 2026: el inventario inicial de abajo es histórico. Ahora existen checkouts locales de centinela-front y predictive-service, un corpus recibido de 28100 artículos para desarrollo, preparación reproducible y un explorador Angular con diagnóstico de calidad. La [inspección del predictor](predictor-heredado.md) y la [preparación versionada](calidad-preparacion.md) registran ese avance. Siguen pendientes Lakehouse, acceso operacional a Neo4j/MongoDB, modelos propios, XAI e integración real de identidad/gateway. El permiso de desarrollo y las fechas recibidas no acreditan viabilidad para una evaluación predictiva final.
+
 - Código local: `app/`, requisitos fijados, configuración de ejecución y CI existente de analytics-service.
 - Ejecución local: pruebas automatizadas, inventario AST, manifiesto del entorno y exportación OpenAPI.
 - Fuentes externas: archivos públicos de la rama `develop` indicados abajo. Son referencias móviles: conservar su revisión exacta antes de implementar cambios entre repositorios.

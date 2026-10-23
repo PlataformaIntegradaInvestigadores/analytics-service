@@ -4,14 +4,17 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from app.api.analytics import local_processing_only
 from app.api.analytics import router as analytics_router
-from app.data import documents
+from app.data import documents, quality
 from app.schemas.documents import (
     ArticlePage,
     Candidate,
+    CorpusQuality,
     DescriptorPage,
     Detail,
     Preparation,
     TopicOutputs,
+    WorksetCreation,
+    WorksetSummary,
 )
 
 router = APIRouter(
@@ -98,6 +101,65 @@ def descriptors(
 @router.get("/corpus/summary", response_model=dict)
 def summary(path=corpus_dependency):
     return documents.summary(path)
+
+
+@router.get("/corpus/quality", response_model=CorpusQuality)
+def corpus_quality(path=corpus_dependency):
+    return quality.quality_report(path)
+
+
+@router.post(
+    "/corpus/preparation/preview",
+    response_model=WorksetSummary,
+    response_model_exclude_none=True,
+)
+def preparation_preview(configuration: Preparation, path=corpus_dependency):
+    return quality.preview(path, configuration.model_dump())
+
+
+@router.post(
+    "/corpus/worksets", response_model=WorksetSummary, response_model_exclude_none=True
+)
+def create_workset(payload: WorksetCreation, request: Request, path=corpus_dependency):
+    directory = request.app.state.settings.workset_directory
+    if directory is None:
+        raise HTTPException(
+            503,
+            detail={
+                "code": "workset_storage_unconfigured",
+                "message": "Configure external workset storage",
+            },
+        )
+    return quality.create_workset(
+        path, directory, payload.configuration.model_dump(), payload.expected_workset_id
+    )
+
+
+@router.get(
+    "/corpus/worksets/{identifier}",
+    response_model=WorksetSummary,
+    response_model_exclude_none=True,
+)
+def stored_workset(identifier: str, request: Request):
+    from app.domain.common import AnalyticsError
+
+    directory = request.app.state.settings.workset_directory
+    if directory is None:
+        raise HTTPException(
+            503,
+            detail={
+                "code": "workset_storage_unconfigured",
+                "message": "Configure external workset storage",
+            },
+        )
+    try:
+        return quality.stored_workset(directory, identifier)
+    except AnalyticsError as exc:
+        if exc.code == "workset_not_found":
+            raise HTTPException(
+                404, detail={"code": exc.code, "message": str(exc)}
+            ) from exc
+        raise
 
 
 @router.post("/corpus/worksets/preview", response_model=dict)

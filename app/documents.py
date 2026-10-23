@@ -8,7 +8,7 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from app.core.json_io import read_json_file
-from app.data import documents
+from app.data import documents, quality
 from app.domain.common import AnalyticsError, canonical_json
 
 
@@ -26,6 +26,7 @@ def main(argv=None):
             "workset",
             "protocol",
             "evaluate",
+            "quality",
         ],
     )
     parser.add_argument("--database", type=Path, required=True)
@@ -75,6 +76,8 @@ def main(argv=None):
             result = documents.descriptor_page(args.database, args.limit, args.offset)
         elif op == "summary":
             result = documents.summary(args.database)
+        elif op == "quality":
+            result = quality.quality_report(args.database)
         elif op == "workset":
             result = documents.working_manifest(args.database)
         else:

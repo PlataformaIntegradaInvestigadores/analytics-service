@@ -13,9 +13,11 @@ immutable experiment artifacts with lineage and software provenance. Paginated
 queries and observed/forecast projections prepare the existing frontend's data
 contract; XAI responses explicitly remain pending/unavailable.
 
-Corpus acquisition, a deployed Data Lakehouse, fitted topic/predictive models,
-XAI and frontend/identity integration remain pending. Controlled test fixtures
-are explicitly synthetic and do not constitute empirical thesis results.
+The received corpus exports are available for development. A deployed Data
+Lakehouse, fitted topic/predictive models, XAI and identity/gateway integration
+remain pending. The existing Angular frontend includes a documentary explorer
+and preparation UI. Controlled test fixtures are explicitly synthetic and do
+not constitute empirical thesis results.
 
 ## Planned scope
 
@@ -98,6 +100,9 @@ python -X utf8 -m app.audit schema --public-base-path /api/analytics
 See [local operations and reproduction](docs/operacion-reproducible.md),
 [architecture diagnosis](docs/diagnostico-arquitectura.md) and
 [provided-literature review](docs/revision-literatura.md).
+
+See [aggregate quality and immutable development preparation](docs/calidad-preparacion.md)
+for typed corpus diagnostics, compact previews and server-managed workset creation.
 See [analytical workflow, examples and backlog mapping](docs/flujo-analitico-local.md)
 for exact limits, implemented/pending scope and manual Git Bash/VS Code/Azure steps.
 The [Centinela development corpus adapter](docs/corpus-desarrollo.md) handles the

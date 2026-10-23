@@ -30,6 +30,63 @@ class Article(Contract):
     descriptor_count: int
 
 
+class WorksetCreation(Contract):
+    configuration: Preparation
+    expected_workset_id: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+
+class PreparationCounts(Contract):
+    included: int
+    excluded: int
+    exclusion_reasons: dict[str, int]
+
+
+class WorksetSummary(Contract):
+    workset_id: str
+    preparation_version: str
+    configuration: Preparation
+    source_version: str
+    source_sha256: dict[str, str]
+    software_sha256: dict[str, str]
+    counts: PreparationCounts
+    purpose: str
+    training: str
+    language: str
+    temporal_precision: str
+    duplicate_groups: int
+    reused: bool | None = None
+
+
+class LanguageQuality(Contract):
+    unknown: int
+    declared: int
+    detection: str
+
+
+class DateQuality(Contract):
+    day_one: int
+    january_one: int
+    articles_by_year: dict[str, int]
+    precision: str
+    coverage: str
+
+
+class CorpusQuality(Contract):
+    quality_id: str
+    quality_version: str
+    source_version: str
+    source_sha256: dict[str, str]
+    software_sha256: dict[str, str]
+    articles: int
+    missing_abstracts: int
+    abstract_token_buckets: dict[str, int]
+    duplicate_text_groups: int
+    duplicate_text_excess: int
+    language: LanguageQuality
+    dates: DateQuality
+    policy: str
+
+
 class ArticlePage(Contract):
     status: Literal["ok", "empty"]
     total: int

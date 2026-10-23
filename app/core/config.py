@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     artifact_database: Path | None = None
     corpus_database: Path | None = None
     workset_database: Path | None = None
+    workset_directory: Path | None = None
     max_request_bytes: int = Field(
         default=8 * 1024 * 1024, ge=1024, le=64 * 1024 * 1024
     )
