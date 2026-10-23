@@ -1,0 +1,92 @@
+{
+  "kind": "reference_forecast",
+  "request": {
+    "series": {
+      "batch": {
+        "data_kind": "synthetic",
+        "records": [
+          {
+            "source": "synthetic-demo",
+            "source_id": "jan-1",
+            "doi": "10.9999/synthetic-jan-1",
+            "title": "Synthetic January example",
+            "publication_date": "2020-01-15",
+            "available_on": "2020-01-15",
+            "retrieved_at": "2026-10-21T12:00:00Z"
+          },
+          {
+            "source": "synthetic-demo",
+            "source_id": "feb-1",
+            "doi": "10.9999/synthetic-feb-1",
+            "title": "Synthetic February example one",
+            "publication_date": "2020-02-15",
+            "available_on": "2020-02-15",
+            "retrieved_at": "2026-10-21T12:00:00Z"
+          },
+          {
+            "source": "synthetic-demo",
+            "source_id": "feb-2",
+            "doi": "10.9999/synthetic-feb-2",
+            "title": "Synthetic February example two",
+            "publication_date": "2020-02-16",
+            "available_on": "2020-02-16",
+            "retrieved_at": "2026-10-21T12:00:00Z"
+          },
+          {
+            "source": "synthetic-demo",
+            "source_id": "mar-1",
+            "doi": "10.9999/synthetic-mar-1",
+            "title": "Synthetic March example",
+            "publication_date": "2020-03-15",
+            "available_on": "2020-03-15",
+            "retrieved_at": "2026-10-21T12:00:00Z"
+          },
+          {
+            "source": "synthetic-demo",
+            "source_id": "apr-1",
+            "doi": "10.9999/synthetic-apr-1",
+            "title": "Synthetic April example one",
+            "publication_date": "2020-04-15",
+            "available_on": "2020-04-15",
+            "retrieved_at": "2026-10-21T12:00:00Z"
+          },
+          {
+            "source": "synthetic-demo",
+            "source_id": "apr-2",
+            "doi": "10.9999/synthetic-apr-2",
+            "title": "Synthetic April example two",
+            "publication_date": "2020-04-16",
+            "available_on": "2020-04-16",
+            "retrieved_at": "2026-10-21T12:00:00Z"
+          }
+        ]
+      },
+      "assignments": {
+        "doi:10.9999/synthetic-jan-1": "synthetic-topic-a",
+        "doi:10.9999/synthetic-feb-1": "synthetic-topic-a",
+        "doi:10.9999/synthetic-feb-2": "synthetic-topic-a",
+        "doi:10.9999/synthetic-mar-1": "synthetic-topic-a",
+        "doi:10.9999/synthetic-apr-1": "synthetic-topic-a",
+        "doi:10.9999/synthetic-apr-2": "synthetic-topic-a"
+      },
+      "topic_ids": [
+        "synthetic-topic-a",
+        "synthetic-topic-b"
+      ],
+      "topic_definition_version": "synthetic-manual-assignments-v1",
+      "start": "2020-01",
+      "end": "2020-05",
+      "covered_periods": [
+        "2020-01",
+        "2020-02",
+        "2020-03",
+        "2020-04",
+        "2020-05"
+      ]
+    },
+    "topic_id": "synthetic-topic-a",
+    "cutoff": "2020-04",
+    "horizon": 2
+  },
+  "parent_ids": []
+}
