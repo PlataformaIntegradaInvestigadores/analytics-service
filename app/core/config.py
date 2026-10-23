@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     public_base_path: str = "/api/v1"
     port: int = Field(default=8006, ge=1024, le=65535)
     artifact_database: Path | None = None
+    model_database: Path | None = None
     corpus_database: Path | None = None
     workset_database: Path | None = None
     workset_directory: Path | None = None
