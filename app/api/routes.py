@@ -27,5 +27,5 @@ def status() -> dict:
     return {
         "service": "analytics-service",
         "version": __version__,
-        "stage": "bootstrap",
+        "stage": "data-foundation",
     }
