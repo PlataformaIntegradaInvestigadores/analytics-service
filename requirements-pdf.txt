@@ -1,0 +1,2 @@
+# Preparatory local PDF extraction. No OCR or external service.
+pypdf==7.1.0
