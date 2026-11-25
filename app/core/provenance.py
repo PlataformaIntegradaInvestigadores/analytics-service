@@ -15,6 +15,9 @@ ROOT = Path(__file__).resolve().parents[2]
 CONFIGURATION_FILES = (
     "requirements.txt",
     "requirements-dev.txt",
+    "requirements-storage.txt",
+    "requirements-modeling.txt",
+    "requirements-pdf.txt",
     "constraints.txt",
     "pyproject.toml",
     "Dockerfile",

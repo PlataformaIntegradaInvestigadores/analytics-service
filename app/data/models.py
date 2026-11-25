@@ -23,7 +23,11 @@ class ModelStore:
         encoded = canonical_json(content)
         if (
             artifact.get("format") != "nmf-json-v1"
-            or artifact.get("purpose") != "technical"
+            or artifact.get("purpose") not in ("technical", "research")
+            or (
+                artifact.get("purpose") == "research"
+                and not artifact.get("research_protocol")
+            )
             or fingerprint(content) != artifact.get("model_id")
             or len(encoded.encode()) > MAX_JSON_BYTES
         ):

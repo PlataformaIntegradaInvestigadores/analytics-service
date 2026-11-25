@@ -60,7 +60,12 @@ def quality_report(path):
             "coverage": "unverified_snapshot",
         },
         "policy": (
-            "Development snapshot; duplicate text is not proof of duplicate "
+            (
+                "Research snapshot; "
+                if origin.get("use_scope") == "research_authorized_as_declared"
+                else "Development snapshot; "
+            )
+            + "duplicate text is not proof of duplicate "
             "publications. Date concentrations do not establish precision or "
             "indexation lag. No language has been inferred."
         ),
