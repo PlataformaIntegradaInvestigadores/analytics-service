@@ -1,0 +1,14 @@
+{
+  "status": "specified_before_BERTopic_execution; dependencies_pending",
+  "trace": ["T10.4", "T10.5", "T10.6", "T10.7"],
+  "source": "same prepared real study snapshot used by the frozen NMF model",
+  "partition": "publication_year <= 2015; never 2019-2021 for model selection",
+  "selection": "Sort training document IDs by SHA256 of seed=42 concatenated with ID; first min(2000, eligible training count). Preserve selected IDs privately and publish only their hash/count.",
+  "comparability": "Fit NMF and BERTopic on the same selected real training documents and preparation; do not compare subset BERTopic against full-corpus NMF as equivalent.",
+  "embedding_precondition": "Local encoder with model/revision/hash/license manifest and frozen encoding settings; no corpus sent to external APIs. Missing encoder or compatible dependencies means blocked, not failed quality.",
+  "initial_budget": {"maximum_training_documents": 2000, "maximum_embedding_batch": 32, "maximum_cpu_threads": 4, "maximum_elapsed_seconds": 900, "maximum_process_rss_gib": 6},
+  "metrics": ["coherence with identical definition and term count", "term diversity", "coverage/outlier fraction", "stability with recorded seed", "elapsed time and process peak memory", "restore and transform held-out documents without refitting"],
+  "stop_rule": "Record resource/dependency failures and all configurations. Do not expand before inspecting the bounded training benchmark. Any expansion requires a new version of the protocol before execution.",
+  "adoption": "Document quality, coverage, stability, resources and compatibility. No promise that BERTopic wins; preserve NMF if evidence is insufficient. Topic metrics alone do not establish forecast accuracy, XAI fidelity or human usefulness.",
+  "human_validation": "Technical topic review is separate from sessions with real users. Neither is claimed by this protocol."
+}

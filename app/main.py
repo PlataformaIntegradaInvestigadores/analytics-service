@@ -8,8 +8,11 @@ from fastapi.responses import JSONResponse
 from app import __version__
 from app.api.analytics import router as analytics_router
 from app.api.documents import router as documents_router
+from app.api.layers import router as layers_router
 from app.api.models import router as models_router
 from app.api.routes import health_router, router
+from app.api.study import router as study_router
+from app.api.topic_map import router as topic_map_router
 from app.api.workflow import router as workflow_router
 from app.core.config import Settings
 from app.core.request_limits import RequestBodyLimitMiddleware
@@ -21,8 +24,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application = FastAPI(
         title="Centinela Analytics Service",
         description=(
-            "Local curation, temporal partitions, declared-topic series and reference "
-            "forecasts. Empirical validation, topic modeling and XAI remain pending."
+            "Local corpus preparation, topic research, annual retrospective forecasts "
+            "and exact linear explanations. Institutional and human evaluation pending."
         ),
         version=__version__,
     )
@@ -36,6 +39,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(documents_router, prefix="/api/v1")
     application.include_router(models_router, prefix="/api/v1")
     application.include_router(workflow_router, prefix="/api/v1")
+    application.include_router(study_router, prefix="/api/v1")
+    application.include_router(layers_router, prefix="/api/v1")
+    application.include_router(topic_map_router, prefix="/api/v1")
 
     @application.exception_handler(sqlite3.Error)
     async def storage_error(request: Request, exc: sqlite3.Error):
@@ -62,6 +68,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         request.state.trace_id = trace_id
         response = await call_next(request)
         response.headers["X-Trace-ID"] = trace_id
+        if settings.environment != "local":
+            response.headers["Cache-Control"] = "private, no-store"
         return response
 
     def custom_openapi() -> dict:

@@ -57,11 +57,38 @@ def fit_nmf(
     cutoff=None,
     purpose="technical",
     software=None,
+    research_protocol=None,
+    vectorizer_options=None,
+    initializer="nndsvda",
 ):
-    if purpose != "technical":
+    if purpose not in ("technical", "research"):
         raise AnalyticsError(
             "research_use_pending", "Final research use is not authorized here"
         )
+    if purpose == "research":
+        protocol = research_protocol or {}
+        if (
+            protocol.get("temporal_mode") != "publication_year_reconstruction"
+            or not isinstance(protocol.get("approval_reference"), str)
+            or not protocol["approval_reference"].strip()
+            or type(protocol.get("fit_end_year")) is not int
+            or not protocol.get("source_version")
+            or cutoff is not None
+        ):
+            raise AnalyticsError(
+                "invalid_research_protocol", "Explicit reconstruction protocol required"
+            )
+        research_fit_ids = set(fit_ids)
+        for doc in documents:
+            if doc["document_id"] in research_fit_ids:
+                if not doc.get("publication_date"):
+                    raise AnalyticsError(
+                        "invalid_research_protocol", "Publication year required"
+                    )
+                if parse_day(doc["publication_date"]).year > protocol["fit_end_year"]:
+                    raise AnalyticsError(
+                        "temporal_leakage", "Topic fit exceeds protocol year"
+                    )
     fit = validate_documents(documents, fit_ids, cutoff)
     if (
         not isinstance(workset_id, str)
@@ -75,6 +102,7 @@ def fit_nmf(
         or not 10 <= max_features <= 20000
         or type(max_iter) is not int
         or not 10 <= max_iter <= 1000
+        or initializer not in ("nndsvda", "random")
     ):
         raise AnalyticsError(
             "invalid_model_config", "Invalid bounded NMF configuration"
@@ -83,7 +111,16 @@ def fit_nmf(
     from sklearn.feature_extraction.text import TfidfVectorizer
     from threadpoolctl import threadpool_limits
 
-    vectorizer = TfidfVectorizer(max_features=max_features)
+    options = vectorizer_options or {}
+    if set(options) - {
+        "min_df",
+        "max_df",
+        "stop_words",
+        "strip_accents",
+        "token_pattern",
+    }:
+        raise AnalyticsError("invalid_vectorizer", "Unsupported vectorizer options")
+    vectorizer = TfidfVectorizer(max_features=max_features, **options)
     try:
         matrix = vectorizer.fit_transform([d["text"] for d in fit])
     except ValueError as exc:
@@ -94,7 +131,7 @@ def fit_nmf(
         warnings.simplefilter("always")
         model = NMF(
             n_components=topics,
-            init="nndsvda",
+            init=initializer,
             random_state=seed,
             max_iter=max_iter,
             tol=1e-4,
@@ -132,6 +169,16 @@ def fit_nmf(
     }
     # Vocabulary values may be numpy integer scalars.
     content["vocabulary"] = {k: int(v) for k, v in content["vocabulary"].items()}
+    if purpose == "research":
+        content["research_protocol"] = research_protocol
+        content["temporal_status"] = "publication_year_reconstruction_not_index_replay"
+        content["evaluation"] = (
+            "empirical_research_candidate_not_final_thesis_validation"
+        )
+    if options:
+        content["configuration"]["vectorizer"] = options
+    if initializer != "nndsvda":
+        content["configuration"]["initializer"] = initializer
     return {"model_id": fingerprint(content), **content}
 
 
@@ -163,7 +210,10 @@ def infer_nmf(artifact, documents):
         raise AnalyticsError(
             "invalid_inference", "Unique bounded nonblank documents required"
         )
-    vectorizer = CountVectorizer(vocabulary=artifact["vocabulary"])
+    vectorizer = CountVectorizer(
+        vocabulary=artifact["vocabulary"],
+        **artifact["configuration"].get("vectorizer", {}),
+    )
     transformer = TfidfTransformer()
     transformer.idf_ = np.array(artifact["idf"])
     matrix = transformer.transform(vectorizer.transform([d["text"] for d in documents]))

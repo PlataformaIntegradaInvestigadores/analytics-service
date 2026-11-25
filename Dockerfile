@@ -9,8 +9,8 @@ RUN groupadd --gid 1000 appuser \
     && useradd --uid 1000 --gid appuser --create-home --shell /usr/sbin/nologin appuser
 
 WORKDIR /app
-COPY requirements.txt constraints.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt requirements-storage.txt constraints.txt ./
+RUN pip install --no-cache-dir -r requirements.txt -r requirements-storage.txt
 COPY --chown=appuser:appuser app ./app
 
 USER appuser

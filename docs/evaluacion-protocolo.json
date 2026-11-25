@@ -1,0 +1,19 @@
+{
+  "version": "proposal-20261124",
+  "formal_status": "pending tutor review; no sessions performed by creating this protocol",
+  "trace": ["R06", "R25", "T25.4", "T32.1", "T33.1"],
+  "profiles": "investigadores, autores o gestores; selección y cantidad por acordar con la tutora",
+  "preconditions": ["consentimiento previo", "instrumentos revisados", "versión integrada identificada", "participantes con códigos anónimos"],
+  "tasks": [
+    {"id": "locate", "instruction": "Localizar un tema y describir sus términos y documentos asociados."},
+    {"id": "relation", "instruction": "Interpretar tamaño del nodo, denominador, enlace y umbral; distinguir similitud de causalidad."},
+    {"id": "filter", "instruction": "Aplicar un filtro temporal y explicar qué cambia en los conteos y qué permanece congelado."},
+    {"id": "forecast", "instruction": "Distinguir serie observada y proyección; interpretar referencia, año y límites de cobertura."},
+    {"id": "explain", "instruction": "Identificar la predicción explicada, las variables de entrada y la escala de sus atribuciones."},
+    {"id": "decision", "instruction": "Justificar una decisión académica posible con la información disponible e identificar qué evidencia adicional necesitaría."}
+  ],
+  "observations": {"success": "0/1 conforme al criterio de logro acordado antes de sesiones", "seconds": "tiempo observado de la tarea", "comprehension": "rúbrica propuesta 1..5; anclas y criterio por validar con la tutora", "actionability": "valoración propuesta 1..5; no acredita intervenciones reales"},
+  "analysis": ["descriptivos por tarea con n y faltantes explícitos", "análisis cualitativo trazable de observaciones consentidas", "inferencias solo si diseño y supuestos las justifican", "resultados humanos separados de MAE/RMSE, métricas temáticas y fidelidad XAI"],
+  "privacy": "No incluir nombres, correos, grabaciones ni textos del corpus en Git. Respuestas privadas fuera del repositorio.",
+  "csv_header": "participant_id,task_id,success,seconds,comprehension,actionability"
+}

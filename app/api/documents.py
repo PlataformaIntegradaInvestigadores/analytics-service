@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
-from app.api.analytics import local_processing_only
+from app.api.access import analytics_read_access
 from app.api.analytics import router as analytics_router
 from app.data import documents, quality
 from app.schemas.documents import (
@@ -19,7 +19,7 @@ from app.schemas.documents import (
 
 router = APIRouter(
     tags=["Local corpus"],
-    dependencies=[Depends(local_processing_only)],
+    dependencies=[Depends(analytics_read_access)],
     responses=analytics_router.responses,
 )
 
