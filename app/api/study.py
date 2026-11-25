@@ -41,9 +41,11 @@ def clean_study(result):
         topic.pop("representative_article_ids", None)
     if "limitations" in result:
         result["limitations"] = [
-            "Text modeling uses titles and abstracts."
-            if note == _HISTORICAL_PDF_LIMITATION
-            else note
+            (
+                "Text modeling uses titles and abstracts."
+                if note == _HISTORICAL_PDF_LIMITATION
+                else note
+            )
             for note in result["limitations"]
         ]
     return result
