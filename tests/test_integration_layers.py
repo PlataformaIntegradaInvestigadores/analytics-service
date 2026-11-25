@@ -274,6 +274,20 @@ def test_study_and_review_restore_from_versioned_gold(tmp_path):
         )
         assert result["series"] == study["series"]
         assert result["storage_lineage"]["release_id"] == published["release_id"]
+        assert (
+            client.get(
+                "/api/v1/study", params={"release_id": published["release_id"]}
+            ).json()
+            == result
+        )
+        assert (
+            client.get("/api/v1/study", params={"release_id": "f" * 64}).status_code
+            == 404
+        )
+        assert (
+            client.get("/api/v1/study", params={"release_id": "unknown"}).status_code
+            == 422
+        )
         assert client.get("/api/v1/study/review").json() == {"run_id": "unit-review"}
 
 

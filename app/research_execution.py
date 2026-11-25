@@ -92,8 +92,7 @@ def prepare(corpus, protocol, destination):
             "inferred language"
         ),
         "duplicates": (
-            "earliest date/ID exact normalized text; not DOI-based publication "
-            "merging"
+            "earliest date/ID exact normalized text; not DOI-based publication merging"
         ),
     }
     workset_id = fingerprint(content)
@@ -176,7 +175,7 @@ def topic_quality(model, documents, top_n=10):
     return {
         "document_count": len(documents),
         "npmi_definition": (
-            "mean pairwise normalized PMI over top 10 terms; zero " "cooccurrence=-1"
+            "mean pairwise normalized PMI over top 10 terms; zero cooccurrence=-1"
         ),
         "mean_npmi": sum(t["npmi"] for t in topics) / len(topics),
         "term_diversity": len(set(all_words)) / len(all_words),
@@ -514,7 +513,7 @@ def run_study(corpus, output, protocol):
         "series": series,
         "prediction": forecast,
         "limitations": [
-            "Title and abstract only; full PDF portion of signed plan remains pending",
+            "Text modeling uses titles and abstracts.",
             (
                 "Corpus flag and author/affiliation count semantics not assumed or "
                 "used as predictive features"

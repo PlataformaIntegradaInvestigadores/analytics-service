@@ -17,6 +17,7 @@ from app.domain.annual_prediction import (
     train_ridge,
 )
 from app.domain.common import AnalyticsError
+from app.domain.forecast_evidence import forecast_comparison
 from app.main import create_app
 from app.research_execution import forecast_study, run_study
 from app.schemas.study import StudyProtocol
@@ -85,6 +86,24 @@ def test_validation_selection_excludes_reserved_test_targets():
     assert a["test_records"][0]["prediction"] == b["test_records"][0]["prediction"]
     assert a["fidelity"]["value"] < 1e-12
     assert a["test"]["ridge"]["n"] == 2
+    paired = forecast_comparison({"topic-0": points}, p.model_dump(), a)
+    assert paired["validation"]["overall"]["ridge"] == a["validation"]["ridge"]
+    assert (
+        paired["diagnostic"]["by_topic"]["topic-0"]["last_value"]
+        == a["test"]["last_value"]
+    )
+    assert paired["diagnostic"]["by_year"]["2012"]["ridge"]["n"] == 1
+    assert paired["last_observed_year"] == 2012
+    assert paired["diagnostic_scope"] == "previously_observed_exploratory"
+    for bad_records in (
+        a["test_records"][:-1],
+        [{**row, "baseline_last_value": -1} for row in a["test_records"]],
+        [*a["test_records"], a["test_records"][0]],
+    ):
+        with pytest.raises(AnalyticsError, match="forecast|Forecast"):
+            forecast_comparison(
+                {"topic-0": points}, p.model_dump(), {**a, "test_records": bad_records}
+            )
 
 
 @pytest.mark.parametrize(
@@ -171,7 +190,17 @@ def test_complete_fixture_run_integrity_and_local_guard(tmp_path):
     with pytest.raises(AnalyticsError):
         run_study(corpus, output, config())
     with TestClient(create_app(Settings(study_database=output / "study.sqlite"))) as c:
-        assert c.get("/api/v1/study").status_code == 200
+        response = c.get("/api/v1/study")
+        assert response.status_code == 200
+        assert (
+            response.json()["forecast_comparison"]["diagnostic"]["overall"]["ridge"][
+                "n"
+            ]
+            == 4
+        )
+        assert (
+            c.get("/api/v1/study", params={"release_id": "f" * 64}).status_code == 503
+        )
     with TestClient(
         create_app(
             Settings(environment="production", study_database=output / "study.sqlite")
