@@ -13,6 +13,17 @@ from app.schemas.models import ModelSummary
 def summary(identifier, encoded):
     try:
         model = decode_json(encoded.encode("utf-8"))
+        if model.get("purpose") == "research":
+            protocol = model.get("research_protocol", {})
+            if (
+                protocol.get("temporal_mode") != "publication_year_reconstruction"
+                or not protocol.get("approval_reference")
+                or not protocol.get("source_version")
+                or type(protocol.get("fit_end_year")) is not int
+                or model.get("temporal_status")
+                != "publication_year_reconstruction_not_index_replay"
+            ):
+                raise ValueError("Missing research protocol")
         if (
             fingerprint(model) != identifier
             or model["format"] != "nmf-json-v1"

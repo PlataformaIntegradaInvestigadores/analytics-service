@@ -2,12 +2,12 @@
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
-from app.api.analytics import local_processing_only
+from app.api.access import analytics_read_access
 from app.data import model_queries
 from app.domain.common import AnalyticsError
 from app.schemas.models import ModelPage, ModelSummary
 
-router = APIRouter(tags=["Local models"], dependencies=[Depends(local_processing_only)])
+router = APIRouter(tags=["Models"], dependencies=[Depends(analytics_read_access)])
 
 
 def query(request, operation, *args):

@@ -169,11 +169,15 @@ def descriptor_page(path, limit=20, offset=0):
 def summary(path):
     with read_database(path) as connection:
         report = manifest(connection)
+    research = report.get("use_scope") == "research_authorized_as_declared"
+    state = "ready_for_research_preparation" if research else "ready_for_development"
     return {
-        "status": "ready_for_development",
+        "status": state,
         "diagnostics": report,
-        "training": "pending_use_clarification",
-        "display_states": ["loading", "ready_for_development", "empty", "error"],
+        "training": (
+            "pending_model_protocol" if research else "pending_use_clarification"
+        ),
+        "display_states": ["loading", state, "empty", "error"],
         "units": {
             "articles": "distinct_documents",
             "descriptor_counts": "distinct_documents_per_descriptor",
@@ -242,8 +246,16 @@ def _prepare(path, configuration, sink=None):
             "excluded": len(exclusions),
             "exclusion_reasons": dict(Counter(item["reason"] for item in exclusions)),
         },
-        "purpose": "development_working_set_not_final_temporal_partition",
-        "training": "pending_use_clarification",
+        "purpose": (
+            "research_preparation_not_final_temporal_partition"
+            if origin.get("use_scope") == "research_authorized_as_declared"
+            else "development_working_set_not_final_temporal_partition"
+        ),
+        "training": (
+            "pending_model_protocol"
+            if origin.get("use_scope") == "research_authorized_as_declared"
+            else "pending_use_clarification"
+        ),
         "language": (
             "unknown; no language-specific stemming, lemmatization "
             "or stopword removal applied"

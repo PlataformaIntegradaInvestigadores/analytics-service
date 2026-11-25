@@ -136,6 +136,21 @@ requires the actual shared environment.
 Public prefix: `/api/analytics/` -> `analytics-service:8006/api/v1/`.
 Health: `/api/analytics/health`. Configured in `gateway-service`.
 
+## Research corpus
+
+The authorized eight-table research delivery has a separate immutable importer:
+`python -m app.research ingest --help`. See
+[research corpus preparation](docs/corpus-investigacion.md) for its exact contract,
+provenance, source-preservation rules and current integration limits. It preserves
+the earlier development-corpus importer and does not train models during ingestion.
+
+The [empirical review of forecasting, topics and quality](docs/revision-empirica-prioridades.md)
+adds a non-destructive, reproducible review of the first research study. It records
+prior test exposure, compares 15 annual forecasting candidates and five topic
+designs, and preserves pending owner/human decisions. Aggregate results are
+available locally at `GET /api/v1/study/review` when `ANALYTICS_REVIEW_DATABASE`
+points to a completed, verified review.
+
 ## Quality
 
 ```bash
